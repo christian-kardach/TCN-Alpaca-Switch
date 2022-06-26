@@ -118,28 +118,13 @@ void handleDriver0MinSwitchValue(){device->handlerDriver0MinSwitchValue();}
 void handleDriver0MaxSwitchValue(){device->handlerDriver0MaxSwitchValue();}
 void handleDriver0SwitchStep(){device->handlerDriver0SwitchStep();}
 
-/*
 
-*/
-/*
-void handleAction(){device.handlerAction(server);}
-void handleCommandBlind(){device.handlerCommandBlind(server);}
-void handleCommandBool(){device.handlerCommandBool(server);}
-void handleCommandString(){device.handlerCommandString(server);}
-void handleConnected(){device.handlerConnected(server);}
-void handleDescriptionGet(){device.handlerDescriptionGet(server);}
-void handleDriverInfoGet(){device.handlerDriverInfoGet(server);}
-void handleDriverVersionGet(){device.handlerDriverVersionGet(server);}
-void handleInterfaceVersionGet(){device.handlerInterfaceVersionGet(server);}
-void handleNameGet(){device.handlerNameGet(server);}
-void handleSupportedActionsGet(){device.handlerSupportedActionsGet(server);}
-*/
 /******************************************
  * SETUP
 ******************************************/
 void setup() {
   Serial.begin(115200);
-  Serial.print("Loading...");
+  Serial.print("Connecting to WIFI...");
 
   // Some ESP8266 modules broadcast their own network, this turns that off
   WiFi.mode(WIFI_STA);
@@ -188,68 +173,7 @@ void setup() {
   server->on("/api/v1/switch/0/switchstep",          HTTP_GET, handleDriver0SwitchStep );
 
 
-  /*
-  //Additional ASCOM ALPACA Management setup calls
-  //Per device
-  server.on("/setup",                               HTTP_GET, handleDeviceSetup );
-  server.on("/setup/hostname" ,                     HTTP_ANY, handleDeviceHostname );
-  server.on("/setup/udpport",                       HTTP_ANY, handleDeviceUdpPort );
-  server.on("/setup/location",                      HTTP_ANY, handleDeviceLocation );
-  */
-  
-  //Common ASCOM handlers
-
-  //Generic ASCOM descriptor functions
-  /*
-  server.on("/api/v1/switch/0/action",              HTTP_PUT, handleAction );
-  server.on("/api/v1/switch/0/commandblind",        HTTP_PUT, handleCommandBlind );
-  server.on("/api/v1/switch/0/commandbool",         HTTP_PUT, handleCommandBool );
-  server.on("/api/v1/switch/0/commandstring",       HTTP_PUT, handleCommandString );
-
-  server.on("/api/v1/switch/0/connected",           handleConnected );
-  server.on("/api/v1/switch/0/description",         HTTP_GET, handleDescriptionGet );
-  server.on("/api/v1/switch/0/driverinfo",          HTTP_GET, handleDriverInfoGet );
-  server.on("/api/v1/switch/0/driverversion",       HTTP_GET, handleDriverVersionGet );
-  server.on("/api/v1/switch/0/interfaceversion",    HTTP_GET, handleInterfaceVersionGet );
-  server.on("/api/v1/switch/0/name",                HTTP_GET, handleNameGet );
-  server.on("/api/v1/switch/0/supportedactions",    HTTP_GET, handleSupportedActionsGet );
-  */
-
-
   /* 
-  //Switch-specific functions
-  server.on("/api/v1/switch/0/maxswitch",           HTTP_GET, handlerDriver0Maxswitch );
-  server.on("/api/v1/switch/0/canwrite",            HTTP_GET, handlerDriver0CanWrite );
-  server.on("/api/v1/switch/0/getswitchdescription", HTTP_GET, handlerDriver0SwitchDescription );
-  server.on("/api/v1/switch/0/getswitch",           HTTP_GET, handlerDriver0SwitchState );
-  server.on("/api/v1/switch/0/setswitch",           HTTP_PUT, handlerDriver0SwitchState );
-  server.on("/api/v1/switch/0/getswitchname",       HTTP_GET, handlerDriver0SwitchName );
-  server.on("/api/v1/switch/0/setswitchname",       HTTP_PUT, handlerDriver0SwitchName );  
-  server.on("/api/v1/switch/0/getswitchvalue",      HTTP_GET, handlerDriver0SwitchValue );
-  server.on("/api/v1/switch/0/setswitchvalue",      HTTP_PUT, handlerDriver0SwitchValue );
-  server.on("/api/v1/switch/0/minswitchvalue",      HTTP_GET, handlerDriver0MinSwitchValue );
-  server.on("/api/v1/switch/0/maxswitchvalue",      HTTP_GET, handlerDriver0MaxSwitchValue );
-  server.on("/api/v1/switch/0/switchstep",          HTTP_GET, handlerDriver0SwitchStep );
-
-//Additional ASCOM ALPACA Management setup calls
-  //Per device
-  server.on("/setup",                               HTTP_GET, handlerDeviceSetup );
-  server.on("/setup/hostname" ,                     HTTP_ANY, handlerDeviceHostname );
-  server.on("/setup/udpport",                       HTTP_ANY, handlerDeviceUdpPort );
-  server.on("/setup/location",                      HTTP_ANY, handlerDeviceLocation );
-  //TODO addd mqtt host and port settings. 
-  
-  //Management API
-  server.on("/management/apiversions",              HTTP_GET, handleMgmtVersions );
-  server.on("/management/v1/description",           HTTP_GET, handleMgmtDescription );
-  server.on("/management/v1/configureddevices",     HTTP_GET, handleMgmtConfiguredDevices );
-
-  server.on("/api/v1/switch/0/setup",               HTTP_GET, handlerDriver0Setup ); //ALPACA driver setup - as called by chooser
-  server.on("/api/v1/switch/0/getswitchtype",       HTTP_GET, handlerDriver0SwitchType );
-  server.on("/api/v1/switch/0/setswitchtype",       HTTP_ANY, handlerDriver0SwitchType );
-  server.on("/api/v1/switch/0/numswitches" ,        HTTP_ANY, handlerDriver0SetupNumSwitches );
-  server.on("/api/v1/switch/0/switches",            HTTP_ANY, handlerDriver0SetupSwitches );
-  
   //Custom
   server.on("/status",                              HTTP_GET, handlerStatus);
   server.on("/restart",                             HTTP_ANY, handlerRestart);
