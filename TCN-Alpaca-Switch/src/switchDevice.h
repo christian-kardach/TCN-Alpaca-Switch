@@ -21,6 +21,9 @@ class SwitchDevice
     double relayValue2 = 0.0;
     double relayValue3 = 0.0;
 
+    void setRelayState(int relayNr, bool state);
+    void setRelayValue(int relayNr, double value);
+
     private:
 };
 

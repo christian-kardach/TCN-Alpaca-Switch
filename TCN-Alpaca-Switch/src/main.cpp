@@ -1,5 +1,7 @@
 #include <Arduino.h>
+#include "configuration.hpp"
 
+#include <ArduinoLog.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <ESP8266WebServer.h>
@@ -7,8 +9,6 @@
 
 #include "arduino_secrets.h"
 #include "switchHandler.h"
-
-#define DEBUG_ENABLED true
 
 int status = WL_IDLE_STATUS;
 ///////enter your sensitive data in the Secret tab/arduino_secrets.h
@@ -29,18 +29,13 @@ WiFiUDP Udp;
 SwitchHandler* device = new SwitchHandler(server);
 
 
-
 void CheckForDiscovery() {
   // if there's data available, read a packet
   int packetSize = Udp.parsePacket();
   if (packetSize) {
-    Serial.print("Received packet of size: ");
-    Serial.println(packetSize);
-    Serial.print("From ");
+    Log.notice("Received packet of size: %d" CR, packetSize);
     IPAddress remoteIp = Udp.remoteIP();
-    Serial.print(remoteIp);
-    Serial.print(", on port ");
-    Serial.println(Udp.remotePort());
+    Log.notice("From %s , on port %d" CR, remoteIp.toString().c_str(),  Udp.remotePort());
 
     // read the packet into packetBufffer
     int len = Udp.read(packetBuffer, 255);
@@ -48,8 +43,7 @@ void CheckForDiscovery() {
       //Ensure that it is null terminated
       packetBuffer[len] = 0;
     }
-    Serial.print("Contents: ");
-    Serial.println(packetBuffer);
+    Log.notice("Contents: %s" CR, packetBuffer);
 
     // No undersized packets allowed
     if (len < 16)
@@ -76,19 +70,15 @@ void CheckForDiscovery() {
 
 void printWifiStatus() {
   // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
+  Log.noticeln(F("SSID: %s" CR), WiFi.SSID());
 
   // print your board's IP address:
   IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
+  Log.noticeln(F("IP Address: %s" CR), ip.toString().c_str());
 
   // print the received signal strength:
   long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
+  Log.noticeln("signal strength (RSSI): %l dBm" CR, rssi);
 }
 
 void handleMgmtVersions(){device->handlerMgmtVersions();}
@@ -123,8 +113,12 @@ void handleDriver0SwitchStep(){device->handlerDriver0SwitchStep();}
  * SETUP
 ******************************************/
 void setup() {
-  Serial.begin(115200);
-  Serial.print("Connecting to WIFI...");
+  Serial.begin(9600);
+
+  // Initialize with log level and log output. 
+  Log.begin   (LOG_LEVEL_VERBOSE, &Serial);
+  
+  Log.notice("Connecting to WIFI...");
 
   // Some ESP8266 modules broadcast their own network, this turns that off
   WiFi.mode(WIFI_STA);
@@ -134,10 +128,10 @@ void setup() {
   
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Log.notice(".");
   }
   
-  Serial.println("Connected to wifi");
+  Log.noticeln("Connected to wifi");
   printWifiStatus();
   
   //Management API
@@ -181,9 +175,8 @@ void setup() {
 
   updater.setup(server);
   server->begin();
-  Serial.println("Web server handlers setup & started" );
-
-  Serial.println("Listening for discovery requests...");
+  Log.noticeln("Alpaca server handlers setup & started..." );
+  Log.noticeln("Listening for Alpaca discovery requests...");
   
   Udp.begin(localPort);
 }

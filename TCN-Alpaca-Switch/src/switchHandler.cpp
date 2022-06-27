@@ -5,125 +5,145 @@ SwitchHandler::SwitchHandler(ESP8266WebServer *server)
 {
     _server = server;
     switchDevice = new SwitchDevice();
+    serverTransactionID = 0;
 }
 
 void SwitchHandler::debugServerQuery()
 {
     for (int i = 0; i < _server->args(); i++) {
-        Serial.println((String)i);
-        Serial.println(_server->argName(i));
-        Serial.println(_server->arg(i));
-        Serial.println("--------------------------");    
+        Log.noticeln("%d" CR, i);
+        Log.noticeln("%s" CR, _server->argName(i));
+        Log.noticeln("%s" CR, _server->arg(i));
+        Log.noticeln("--------------------------");
     }
 }
 
-void SwitchHandler::returnEmpty()
+void SwitchHandler::incrementServerTransID()
 {
+    serverTransactionID++;
+}
+
+void SwitchHandler::returnEmpty(String errMsg, int errNr)
+{
+    incrementServerTransID();
     DynamicJsonDocument doc(1024);
 
-    doc["ErrorMessage"] = "";
-    doc["ErrorNumber"] = 0;
+    doc["ErrorMessage"] = errMsg;
+    doc["ErrorNumber"] = errNr;
     doc["ClientTransactionID"] = transID;
-    doc["ServerTransactionID"] = 0;
+    doc["ServerTransactionID"] = serverTransactionID;
 
     String output;
     serializeJson(doc, output);
+    Log.noticeln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
 
-void SwitchHandler::returnBoolValue(bool val)
+void SwitchHandler::returnBoolValue(bool val, String errMsg, int errNr)
 {
+    incrementServerTransID();
     DynamicJsonDocument doc(1024);
 
     doc["Value"] = val;
-    doc["ErrorMessage"] = "";
-    doc["ErrorNumber"] = 0;
+    doc["ErrorMessage"] = errMsg;
+    doc["ErrorNumber"] = errNr;
     doc["ClientTransactionID"] = transID;
-    doc["ServerTransactionID"] = 0;
+    doc["ServerTransactionID"] = serverTransactionID;
 
     String output;
     serializeJson(doc, output);
+    Log.noticeln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
 
-void SwitchHandler::returnStringValue(String val)
+void SwitchHandler::returnStringValue(String val, String errMsg, int errNr)
 {
+    incrementServerTransID();
     DynamicJsonDocument doc(1024);
 
     doc["Value"] = val;
-    doc["ErrorMessage"] = "";
-    doc["ErrorNumber"] = 0;
+    doc["ErrorMessage"] = errMsg;
+    doc["ErrorNumber"] = errNr;
     doc["ClientTransactionID"] = transID;
-    doc["ServerTransactionID"] = 0;
+    doc["ServerTransactionID"] = serverTransactionID;
 
     String output;
     serializeJson(doc, output);
+    Log.noticeln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
 
-void SwitchHandler::returnIntValue(int val)
+void SwitchHandler::returnIntValue(int val, String errMsg, int errNr)
 {
+    incrementServerTransID();
     DynamicJsonDocument doc(1024);
 
     doc["Value"] = val;
-    doc["ErrorMessage"] = "";
-    doc["ErrorNumber"] = 0;
+    doc["ErrorMessage"] = errMsg;
+    doc["ErrorNumber"] = errNr;
     doc["ClientTransactionID"] = transID;
-    doc["ServerTransactionID"] = 0;
+    doc["ServerTransactionID"] = serverTransactionID;
 
     String output;
     serializeJson(doc, output);
+    Log.noticeln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
 
-void SwitchHandler::returnFloatValue(float val)
+void SwitchHandler::returnFloatValue(float val, String errMsg, int errNr)
 {
+    incrementServerTransID();
     DynamicJsonDocument doc(1024);
 
     doc["Value"] = val;
-    doc["ErrorMessage"] = "";
-    doc["ErrorNumber"] = 0;
+    doc["ErrorMessage"] = errMsg;
+    doc["ErrorNumber"] = errNr;
     doc["ClientTransactionID"] = transID;
-    doc["ServerTransactionID"] = 0;
+    doc["ServerTransactionID"] = serverTransactionID;
 
     String output;
     serializeJson(doc, output);
+    Log.noticeln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
 
-void SwitchHandler::returnJsonArrayValue(JsonArray val)
+void SwitchHandler::returnJsonArrayValue(JsonArray val, String errMsg, int errNr)
 {
+    incrementServerTransID();
     DynamicJsonDocument doc(1024);
 
     doc["Value"] = val;
-    doc["ErrorMessage"] = "";
-    doc["ErrorNumber"] = 0;
+    doc["ErrorMessage"] = errMsg;
+    doc["ErrorNumber"] = errNr;
     doc["ClientTransactionID"] = transID;
-    doc["ServerTransactionID"] = 0;
+    doc["ServerTransactionID"] = serverTransactionID;
 
     String output;
     serializeJson(doc, output);
+    Log.noticeln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
 
-void SwitchHandler::returnDoubleValue(double val)
+void SwitchHandler::returnDoubleValue(double val, String errMsg, int errNr)
 {
+    incrementServerTransID();
     DynamicJsonDocument doc(1024);
 
     doc["Value"] = val;
-    doc["ErrorMessage"] = "";
-    doc["ErrorNumber"] = 0;
+    doc["ErrorMessage"] = errMsg;
+    doc["ErrorNumber"] = errNr;
     doc["ClientTransactionID"] = transID;
-    doc["ServerTransactionID"] = 0;
+    doc["ServerTransactionID"] = serverTransactionID;
 
     String output;
     serializeJson(doc, output);
+    Log.noticeln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -133,8 +153,8 @@ void SwitchHandler::returnDoubleValue(double val)
 
 void SwitchHandler::handlerMgmtVersions()
 {
-
-    Serial.println("handlerMgmtVersions");
+    Log.noticeln("handlerMgmtVersions called...");
+    incrementServerTransID();
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -147,153 +167,168 @@ void SwitchHandler::handlerMgmtVersions()
         StaticJsonDocument<CAPACITY> devices;
         JsonArray array = devices.to<JsonArray>();
         array.add(1);
-
+        // returnJsonArrayValue(array);
+        
         doc["Value"] = array;
         doc["ErrorMessage"] = "";
         doc["ErrorNumber"] = 0;
         doc["ClientTransactionID"] = transID;
-        doc["ServerTransactionID"] = 0;
+        doc["ServerTransactionID"] = serverTransactionID;
 
         String output;
         serializeJson(doc, output);
+        Log.noticeln(F("Returning: %s" CR), output.c_str());
         // return output;
         _server->send(200, "text/json", output);
         // sendDeviceSetup( returnCode, message, err );
+        
     }
 }
 
 void SwitchHandler::handlerMgmtDescription()
 {
-    Serial.println("handlerMgmtDescription");
+    Log.noticeln("handlerMgmtDescription called");
 
-    String timeString, message, err;
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     if (_server->method() == HTTP_GET)
     {
+        incrementServerTransID();
         DynamicJsonDocument val(1024);
 
-        val["ServerName"] = "TCN Mount Switch";
-        val["Manufacturer"] = "Christian Kardach";
-        val["ManufacturerVersion"] = "1.0";
-        val["Location"] = "SE";
+        val["ServerName"] = SERVER_NAME; //"TCN Mount Switch";
+        val["Manufacturer"] = MANUFACTURER; // "Christian Kardach";
+        val["ManufacturerVersion"] = MANUFACTURER_VERSION; //"1.0";
+        val["Location"] = LOCATION; //"SE";
 
         const size_t CAPACITY = JSON_ARRAY_SIZE(5);
         StaticJsonDocument<CAPACITY> devices;
         JsonArray array = devices.to<JsonArray>();
         array.add(val);
 
+        //returnJsonArrayValue(array);
+        
         DynamicJsonDocument doc(1024);
         doc["Value"] = val;
         doc["ErrorMessage"] = "";
         doc["ErrorNumber"] = 0;
         doc["ClientTransactionID"] = transID;
-        doc["ServerTransactionID"] = 0;
+        doc["ServerTransactionID"] = serverTransactionID;
 
         String output;
         serializeJson(doc, output);
+        Log.noticeln(F("Returning: %s" CR), output.c_str());
         _server->send(200, "text/json", output);
+        
     }
 }
 
 void SwitchHandler::handlerMgmtConfiguredDevices()
 {
-    Serial.println("handlerMgmtConfiguredDevices");
+    Log.noticeln("handlerMgmtConfiguredDevices called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     if (_server->method() == HTTP_GET)
     {
+        incrementServerTransID();
         DynamicJsonDocument val(1024);
         DynamicJsonDocument doc(1024);
 
         const size_t CAPACITY = JSON_ARRAY_SIZE(5);
         StaticJsonDocument<CAPACITY> devices;
 
-        val["DeviceName"] = "TCN Mount Switch";
-        val["DeviceType"] = "Switch";
-        val["DeviceNumber"] = 0;
-        val["UniqueID"] = uniqueID;
+        val["DeviceName"] = DEVICE_NAME; //"TCN Mount Switch";
+        val["DeviceType"] = DEVICE_TYPE; //"Switch";
+        val["DeviceNumber"] = DEVICE_NR; //0;
+        val["UniqueID"] = UNIQUE_CLIENT_ID;
         JsonArray array = devices.to<JsonArray>();
         array.add(val);
 
+        // returnJsonArrayValue(array);
+        
         doc["Value"] = array;
         doc["ErrorMessage"] = "";
         doc["ErrorNumber"] = 0;
         doc["ClientTransactionID"] = transID;
-        doc["ServerTransactionID"] = 0;
+        doc["ServerTransactionID"] = serverTransactionID;
 
         String output;
         serializeJson(doc, output);
+        Log.noticeln(F("Returning: %s" CR), output.c_str());
 
         _server->send(200, "text/json", output);
+        
     }
 }
 
 void SwitchHandler::handlerConnected()
 {
-    Serial.println("handlerConnected");
+    Log.noticeln("handlerConnected called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     if (_server->method() == HTTP_GET)
     {
-        Serial.println("handlerConnected GET");
+        Log.noticeln("handlerConnected GET called");
 
         String deviceType = _server->arg("device_type");
-        uint32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+        //uint32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
 
-        returnBoolValue(switchDevice->connected);
+        returnBoolValue(switchDevice->connected, "", 0);
     }
 
     if (_server->method() == HTTP_PUT)
     {
-        Serial.println("handlerConnected POST");
+        Log.noticeln("handlerConnected POST called");
 
         // String _connected = _server->arg("Connected");
         switchDevice->connected = (bool)_server->arg("Connected");
-        Serial.println(switchDevice->connected);
+        // Log.noticeln("%t", CR, switchDevice->connected);
 
-        returnEmpty();
+        returnEmpty("", 0);
     }
 }
 
+/***********************************
+ * ASCOM STANDARD
+ **********************************/
 void SwitchHandler::handlerDescriptionGet()
 {
-    Serial.println("handlerDescriptionGet");
-    returnStringValue("TCN Mount Switch");
+    Log.noticeln("handlerDescriptionGet called");
+    returnStringValue(DESCRIPTION, "", 0);
 }
 
 void SwitchHandler::handlerDriverInfoGet()
 {
-    Serial.println("handlerDriverInfoGet");
-    returnStringValue("Custom driver");
+    Log.noticeln("handlerDriverInfoGet called");
+    returnStringValue(DRIVER_INFO, "", 0);
 }
 
 void SwitchHandler::handlerDriverVersionGet()
 {
-    Serial.println("handlerDriverVersionGet");
-    returnFloatValue(1.0f);
+    Log.noticeln("handlerDriverVersionGet called");
+    returnStringValue(DRIVER_VERSION, "", 0);
 }
 
 void SwitchHandler::handlerInterfaceVersionGet()
 {
-    Serial.println("handlerInterfaceVersionGet");
-    returnIntValue(1);
+    Log.noticeln("handlerInterfaceVersionGet called");
+    returnIntValue(1, "", 0);
 }
 
 void SwitchHandler::handlerNameGet()
 {
-    Serial.println("handlerNameGet");
-    returnStringValue("TCN Mount Switch");
+    Log.noticeln("handlerNameGet called");
+    returnStringValue(DEVICE_NAME, "", 0);
 }
 
 void SwitchHandler::handlerSupportedActionsGet()
 {
-    Serial.println("handlerSupportedActionsGet");
+    Log.noticeln("handlerSupportedActionsGet called");
 
     DynamicJsonDocument val(1024);
     const size_t CAPACITY = JSON_ARRAY_SIZE(13);
@@ -314,88 +349,81 @@ void SwitchHandler::handlerSupportedActionsGet()
     array.add("maxswitchvalue");
     array.add("switchstep");
 
-    returnJsonArrayValue(array);
+    returnJsonArrayValue(array, "", 0);
     
 }
 
-/***********************************
- * ASCOM STANDARD
- **********************************/
 void SwitchHandler::handleAction()
 {
-    Serial.println("handleAction");
+    Log.noticeln("handleAction called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     String deviceType = _server->arg("device_type");
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    //u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
 
     String action = _server->arg("Action");
     String parameters = _server->arg("Parameters");
 
-    Serial.println(action);
-    Serial.println(parameters);
-
-    returnStringValue("ok");
-    
+    returnStringValue("ok", "", 0);
 }
 
 void SwitchHandler::handleCommandBlind()
 {
-    Serial.println("handleCommandBlind");
+    Log.noticeln("handleCommandBlind called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     String deviceType = _server->arg("device_type");
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
 
     String command = _server->arg("Command");
     String raw = _server->arg("Raw");
 
-    Serial.println(command);
-    Serial.println(raw);
+    Log.noticeln("%s" CR, command);
+    Log.noticeln("%s" CR, raw);
 
-    returnEmpty();
+    returnEmpty("", 0);
 }
 
 void SwitchHandler::handleCommandBool()
 {
-    Serial.println("handleCommandBool");
+    Log.noticeln("handleCommandBool called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     String deviceType = _server->arg("device_type");
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
 
     String command = _server->arg("Command");
     String raw = _server->arg("Raw");
 
-    Serial.println(command);
-    Serial.println(raw);
+    Log.noticeln("%s" CR, command);
+    Log.noticeln("%s" CR, raw);
 
-    returnBoolValue(true);
+    returnBoolValue(true, "", 0);
 }
 
 void SwitchHandler::handleCommandString()
 {
-    Serial.println("handleCommandBool");
+    Log.noticeln("handleCommandBool called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     String deviceType = _server->arg("device_type");
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
 
     String command = _server->arg("Command");
     String raw = _server->arg("Raw");
 
-    Serial.println(command);
-    Serial.println(raw);
+    Log.noticeln("%s" CR, command.c_str());
+    Log.noticeln("%s" CR, raw.c_str());
 
-    returnStringValue("ok");
+    returnStringValue("ok", "", 0);
 }
 
 /***********************************
@@ -403,240 +431,217 @@ void SwitchHandler::handleCommandString()
  **********************************/
 void SwitchHandler::handlerDriver0Maxswitch()
 {
-    Serial.println("handlerDriver0Maxswitch");
+    Log.noticeln("handlerDriver0Maxswitch called");
     
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    returnIntValue(4);
+    returnIntValue(NR_OF_RELAYS, "", 0);
 }
 
 void SwitchHandler::handlerDriver0CanWrite()
 {
-    Serial.println("handlerDriver0CanWrite");
+    Log.noticeln("handlerDriver0CanWrite called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
-    u_int32_t id = (uint32_t)_server->arg("ID").toInt();
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t id = (uint32_t)_server->arg("ID").toInt();
     
-    returnBoolValue(true);
+    returnBoolValue(true, "", 0);
 }
 
 void SwitchHandler::handlerDriver0SwitchDescription()
 {
-    Serial.println("handlerDriver0SwitchDescription");
+    Log.noticeln("handlerDriver0SwitchDescription called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
-    u_int32_t id = (uint32_t)_server->arg("ID").toInt();
-    Serial.println(id);
-
-    returnStringValue("Switch Description");
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t id = (uint32_t)_server->arg("ID").toInt();
+    
+    returnStringValue("Switch Description", "", 0);
 }
 
 void SwitchHandler::handlerDriver0SwitchState()
 {
-    Serial.println("handlerDriver0SwitchState");
+    Log.noticeln("handlerDriver0SwitchState called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
     u_int32_t id = (uint32_t)_server->arg("ID").toInt();
-    
-    Serial.println(id);
 
     if (_server->method() == HTTP_GET)
     {
-        Serial.println("GET SwitchState");
+        Log.noticeln("GET SwitchState called");
         if(id == 0)
         {
-            returnBoolValue(switchDevice->relayState0);
+            returnBoolValue(switchDevice->relayState0, "", 0);
         }
         else if(id == 1)
         {
-            returnBoolValue(switchDevice->relayState1);
+            returnBoolValue(switchDevice->relayState1, "", 0);
         }
         else if(id == 2)
         {
-            returnBoolValue(switchDevice->relayState2);
+            returnBoolValue(switchDevice->relayState2, "", 0);
         }
         else if(id == 3)
         {
-            returnBoolValue(switchDevice->relayState3);
+            returnBoolValue(switchDevice->relayState3, "", 0);
         }
      
     }
     else if (_server->method() == HTTP_PUT)
     {
-        Serial.println("PUT SwitchState");
+        Log.noticeln("PUT SwitchState called");
         bool val = (bool)_server->arg("State");
-        Serial.println(val);
 
         if(id == 0)
         {
             switchDevice->relayState0 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
         else if(id == 1)
         {
             switchDevice->relayState1 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
         else if(id == 2)
         {
             switchDevice->relayState2 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
         else if(id == 3)
         {
             switchDevice->relayState3 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
     }
 
-
-    //returnBoolValue(false);
 }
 
 void SwitchHandler::handlerDriver0SwitchName()
 {
-    Serial.println("handlerDriver0SwitchName");
+    Log.noticeln("handlerDriver0SwitchName called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
     u_int32_t id = (uint32_t)_server->arg("ID").toInt();
-    
-    // Serial.println(deviceNumber);
-    Serial.println(id);
 
     if(id == 0)
     {
-        Serial.println("TestSwitch 0");
-        returnStringValue("TestSwitch 0");
+        returnStringValue(RELAY_1_NAME, "", 0);
     }
     else if(id == 1)
     {
-        Serial.println("TestSwitch 1");
-        returnStringValue("TestSwitch 1");
+        returnStringValue(RELAY_2_NAME, "", 0);
     }
     else if(id == 2)
     {
-        Serial.println("TestSwitch 2");
-        returnStringValue("TestSwitch 2");
+        returnStringValue(RELAY_3_NAME, "", 0);
     }
     else if(id == 3)
     {
-        Serial.println("TestSwitch 3");
-        returnStringValue("TestSwitch 3");
+        returnStringValue(RELAY_4_NAME, "", 0);
     }
-    else
-    {
-        Serial.println("TestSwitch");
-        returnStringValue("TestSwitch");
-    }
-   
 }
 
 void SwitchHandler::handlerDriver0SwitchValue()
 {
-    Serial.println("handlerDriver0SwitchValue");
+    Log.noticeln("handlerDriver0SwitchValue called");
     //debugServerQuery();
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
     u_int32_t id = (uint32_t)_server->arg("ID").toInt();
 
     if (_server->method() == HTTP_GET)
     {
-        Serial.println("GET SwitchValue");
+        Log.noticeln("GET SwitchValue called");
         if(id == 0)
         {
-            returnDoubleValue(switchDevice->relayValue0);
+            returnDoubleValue(switchDevice->relayValue0, "", 0);
         }
         else if(id == 1)
         {
-            returnDoubleValue(switchDevice->relayValue1);
+            returnDoubleValue(switchDevice->relayValue1, "", 0);
         }
         else if(id == 2)
         {
-            returnDoubleValue(switchDevice->relayValue2);
+            returnDoubleValue(switchDevice->relayValue2, "", 0);
         }
         else if(id == 3)
         {
-            returnDoubleValue(switchDevice->relayValue3);
+            returnDoubleValue(switchDevice->relayValue3, "", 0);
         }
      
     }
     else if (_server->method() == HTTP_PUT)
     {
-        Serial.println("PUT SwitchValue");
+        Log.noticeln("PUT SwitchValue called");
         double val = (double)_server->arg("Value").toDouble();
-        Serial.println(val);
-
+        
         if(id == 0)
         {
             switchDevice->relayValue0 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
         else if(id == 1)
         {
             switchDevice->relayValue1 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
         else if(id == 2)
         {
             switchDevice->relayValue2 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
         else if(id == 3)
         {
             switchDevice->relayValue3 = val;
-            returnEmpty();
+            returnEmpty("", 0);
         }
     }
-    
+
 
 }
 
 void SwitchHandler::handlerDriver0MinSwitchValue()
 {
-    Serial.println("handlerDriver0MinSwitchValue");
+    Log.noticeln("handlerDriver0MinSwitchValue called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
-    u_int32_t id = (uint32_t)_server->arg("ID").toInt();
-    Serial.println(id);
-
-    returnDoubleValue(0.0);
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t id = (uint32_t)_server->arg("ID").toInt();
+    
+    returnDoubleValue(0.0, "", 0);
 }
 
 void SwitchHandler::handlerDriver0MaxSwitchValue()
 {
-    Serial.println("handlerDriver0MaxSwitchValue");
+    Log.noticeln("handlerDriver0MaxSwitchValue called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
-    u_int32_t id = (uint32_t)_server->arg("ID").toInt();
-    Serial.println(id);
-
-    returnDoubleValue(1.0);
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t id = (uint32_t)_server->arg("ID").toInt();
+    
+    returnDoubleValue(1.0, "", 0);
 }
 
 void SwitchHandler::handlerDriver0SwitchStep()
 {
-    Serial.println("handlerDriver0SwitchStep");
+    Log.noticeln("handlerDriver0SwitchStep called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
-    u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
-    u_int32_t id = (uint32_t)_server->arg("ID").toInt();
-    Serial.println(id);
-
-    returnDoubleValue(1.0);
+    // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
+    // u_int32_t id = (uint32_t)_server->arg("ID").toInt();
+    
+    returnDoubleValue(1.0, "", 0);
 }
