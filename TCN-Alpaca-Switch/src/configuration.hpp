@@ -14,11 +14,20 @@
 #define DRIVER_INFO "TCN ASCOM Alpaca Driver"
 #define DRIVER_VERSION "1.0"
 
-
 #define NR_OF_RELAYS 4
 
-#define RELAY_1_NAME "R1"
-#define RELAY_2_NAME "R2"
-#define RELAY_3_NAME "R3"
-#define RELAY_4_NAME "R4"
+#define RELAY_PIN_1 14
+#define RELAY_PIN_2 12
+#define RELAY_PIN_3 13
+#define RELAY_PIN_4 15
+
+#define RELAY_1_NAME "Camera"
+#define RELAY_2_NAME "Primary Mirror Fan"
+#define RELAY_3_NAME "--"
+#define RELAY_4_NAME "--"
+
+#define RELAY_1_DESC "Camera Power"
+#define RELAY_2_DESC "Cooling fan for primary mirror"
+#define RELAY_3_DESC "--"
+#define RELAY_4_DESC "--"
 

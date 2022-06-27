@@ -33,9 +33,9 @@ void CheckForDiscovery() {
   // if there's data available, read a packet
   int packetSize = Udp.parsePacket();
   if (packetSize) {
-    Log.notice("Received packet of size: %d" CR, packetSize);
+    Log.traceln("Received packet of size: %d" CR, packetSize);
     IPAddress remoteIp = Udp.remoteIP();
-    Log.notice("From %s , on port %d" CR, remoteIp.toString().c_str(),  Udp.remotePort());
+    Log.traceln("From %s , on port %d" CR, remoteIp.toString().c_str(),  Udp.remotePort());
 
     // read the packet into packetBufffer
     int len = Udp.read(packetBuffer, 255);
@@ -43,7 +43,7 @@ void CheckForDiscovery() {
       //Ensure that it is null terminated
       packetBuffer[len] = 0;
     }
-    Log.notice("Contents: %s" CR, packetBuffer);
+    Log.traceln("Contents: %s" CR, packetBuffer);
 
     // No undersized packets allowed
     if (len < 16)
@@ -70,15 +70,15 @@ void CheckForDiscovery() {
 
 void printWifiStatus() {
   // print the SSID of the network you're attached to:
-  Log.noticeln(F("SSID: %s" CR), WiFi.SSID());
+  Log.traceln(F("SSID: %s" CR), WiFi.SSID());
 
   // print your board's IP address:
   IPAddress ip = WiFi.localIP();
-  Log.noticeln(F("IP Address: %s" CR), ip.toString().c_str());
+  Log.traceln(F("IP Address: %s" CR), ip.toString().c_str());
 
   // print the received signal strength:
   long rssi = WiFi.RSSI();
-  Log.noticeln("signal strength (RSSI): %l dBm" CR, rssi);
+  Log.traceln("signal strength (RSSI): %l dBm" CR, rssi);
 }
 
 void handleMgmtVersions(){device->handlerMgmtVersions();}
@@ -116,9 +116,9 @@ void setup() {
   Serial.begin(9600);
 
   // Initialize with log level and log output. 
-  Log.begin   (LOG_LEVEL_VERBOSE, &Serial);
+  Log.begin   (LOG_LEVEL_INFO, &Serial);
   
-  Log.notice("Connecting to WIFI...");
+  Log.infoln("Connecting to WIFI...");
 
   // Some ESP8266 modules broadcast their own network, this turns that off
   WiFi.mode(WIFI_STA);
@@ -128,10 +128,10 @@ void setup() {
   
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Log.notice(".");
+    Log.traceln(".");
   }
   
-  Log.noticeln("Connected to wifi");
+  Log.infoln("Connected to wifi");
   printWifiStatus();
   
   //Management API
@@ -175,8 +175,8 @@ void setup() {
 
   updater.setup(server);
   server->begin();
-  Log.noticeln("Alpaca server handlers setup & started..." );
-  Log.noticeln("Listening for Alpaca discovery requests...");
+  Log.infoln("Alpaca server handlers setup & started..." );
+  Log.infoln("Listening for Alpaca discovery requests...");
   
   Udp.begin(localPort);
 }

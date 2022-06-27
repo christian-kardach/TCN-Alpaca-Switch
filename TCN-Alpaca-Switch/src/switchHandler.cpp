@@ -11,10 +11,10 @@ SwitchHandler::SwitchHandler(ESP8266WebServer *server)
 void SwitchHandler::debugServerQuery()
 {
     for (int i = 0; i < _server->args(); i++) {
-        Log.noticeln("%d" CR, i);
-        Log.noticeln("%s" CR, _server->argName(i));
-        Log.noticeln("%s" CR, _server->arg(i));
-        Log.noticeln("--------------------------");
+        Log.traceln("%d" CR, i);
+        Log.traceln("%s" CR, _server->argName(i));
+        Log.traceln("%s" CR, _server->arg(i));
+        Log.traceln("--------------------------");
     }
 }
 
@@ -35,7 +35,7 @@ void SwitchHandler::returnEmpty(String errMsg, int errNr)
 
     String output;
     serializeJson(doc, output);
-    Log.noticeln(F("Returning: %s" CR), output.c_str());
+    Log.traceln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -53,7 +53,7 @@ void SwitchHandler::returnBoolValue(bool val, String errMsg, int errNr)
 
     String output;
     serializeJson(doc, output);
-    Log.noticeln(F("Returning: %s" CR), output.c_str());
+    Log.traceln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -71,7 +71,7 @@ void SwitchHandler::returnStringValue(String val, String errMsg, int errNr)
 
     String output;
     serializeJson(doc, output);
-    Log.noticeln(F("Returning: %s" CR), output.c_str());
+    Log.traceln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -89,7 +89,7 @@ void SwitchHandler::returnIntValue(int val, String errMsg, int errNr)
 
     String output;
     serializeJson(doc, output);
-    Log.noticeln(F("Returning: %s" CR), output.c_str());
+    Log.traceln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -107,7 +107,7 @@ void SwitchHandler::returnFloatValue(float val, String errMsg, int errNr)
 
     String output;
     serializeJson(doc, output);
-    Log.noticeln(F("Returning: %s" CR), output.c_str());
+    Log.traceln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -125,7 +125,7 @@ void SwitchHandler::returnJsonArrayValue(JsonArray val, String errMsg, int errNr
 
     String output;
     serializeJson(doc, output);
-    Log.noticeln(F("Returning: %s" CR), output.c_str());
+    Log.traceln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -143,7 +143,7 @@ void SwitchHandler::returnDoubleValue(double val, String errMsg, int errNr)
 
     String output;
     serializeJson(doc, output);
-    Log.noticeln(F("Returning: %s" CR), output.c_str());
+    Log.traceln(F("Returning: %s" CR), output.c_str());
 
     _server->send(200, "text/json", output);
 }
@@ -153,7 +153,7 @@ void SwitchHandler::returnDoubleValue(double val, String errMsg, int errNr)
 
 void SwitchHandler::handlerMgmtVersions()
 {
-    Log.noticeln("handlerMgmtVersions called...");
+    Log.traceln("handlerMgmtVersions called...");
     incrementServerTransID();
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
@@ -177,7 +177,7 @@ void SwitchHandler::handlerMgmtVersions()
 
         String output;
         serializeJson(doc, output);
-        Log.noticeln(F("Returning: %s" CR), output.c_str());
+        Log.traceln(F("Returning: %s" CR), output.c_str());
         // return output;
         _server->send(200, "text/json", output);
         // sendDeviceSetup( returnCode, message, err );
@@ -187,7 +187,7 @@ void SwitchHandler::handlerMgmtVersions()
 
 void SwitchHandler::handlerMgmtDescription()
 {
-    Log.noticeln("handlerMgmtDescription called");
+    Log.traceln("handlerMgmtDescription called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -218,7 +218,7 @@ void SwitchHandler::handlerMgmtDescription()
 
         String output;
         serializeJson(doc, output);
-        Log.noticeln(F("Returning: %s" CR), output.c_str());
+        Log.traceln(F("Returning: %s" CR), output.c_str());
         _server->send(200, "text/json", output);
         
     }
@@ -226,7 +226,7 @@ void SwitchHandler::handlerMgmtDescription()
 
 void SwitchHandler::handlerMgmtConfiguredDevices()
 {
-    Log.noticeln("handlerMgmtConfiguredDevices called");
+    Log.traceln("handlerMgmtConfiguredDevices called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -257,7 +257,7 @@ void SwitchHandler::handlerMgmtConfiguredDevices()
 
         String output;
         serializeJson(doc, output);
-        Log.noticeln(F("Returning: %s" CR), output.c_str());
+        Log.traceln(F("Returning: %s" CR), output.c_str());
 
         _server->send(200, "text/json", output);
         
@@ -266,14 +266,14 @@ void SwitchHandler::handlerMgmtConfiguredDevices()
 
 void SwitchHandler::handlerConnected()
 {
-    Log.noticeln("handlerConnected called");
+    Log.traceln("handlerConnected called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
 
     if (_server->method() == HTTP_GET)
     {
-        Log.noticeln("handlerConnected GET called");
+        Log.traceln("handlerConnected GET called");
 
         String deviceType = _server->arg("device_type");
         //uint32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
@@ -283,11 +283,11 @@ void SwitchHandler::handlerConnected()
 
     if (_server->method() == HTTP_PUT)
     {
-        Log.noticeln("handlerConnected POST called");
+        Log.traceln("handlerConnected POST called");
 
         // String _connected = _server->arg("Connected");
         switchDevice->connected = (bool)_server->arg("Connected");
-        // Log.noticeln("%t", CR, switchDevice->connected);
+        // Log.traceln("%t", CR, switchDevice->connected);
 
         returnEmpty("", 0);
     }
@@ -298,37 +298,37 @@ void SwitchHandler::handlerConnected()
  **********************************/
 void SwitchHandler::handlerDescriptionGet()
 {
-    Log.noticeln("handlerDescriptionGet called");
+    Log.traceln("handlerDescriptionGet called");
     returnStringValue(DESCRIPTION, "", 0);
 }
 
 void SwitchHandler::handlerDriverInfoGet()
 {
-    Log.noticeln("handlerDriverInfoGet called");
+    Log.traceln("handlerDriverInfoGet called");
     returnStringValue(DRIVER_INFO, "", 0);
 }
 
 void SwitchHandler::handlerDriverVersionGet()
 {
-    Log.noticeln("handlerDriverVersionGet called");
+    Log.traceln("handlerDriverVersionGet called");
     returnStringValue(DRIVER_VERSION, "", 0);
 }
 
 void SwitchHandler::handlerInterfaceVersionGet()
 {
-    Log.noticeln("handlerInterfaceVersionGet called");
+    Log.traceln("handlerInterfaceVersionGet called");
     returnIntValue(1, "", 0);
 }
 
 void SwitchHandler::handlerNameGet()
 {
-    Log.noticeln("handlerNameGet called");
+    Log.traceln("handlerNameGet called");
     returnStringValue(DEVICE_NAME, "", 0);
 }
 
 void SwitchHandler::handlerSupportedActionsGet()
 {
-    Log.noticeln("handlerSupportedActionsGet called");
+    Log.traceln("handlerSupportedActionsGet called");
 
     DynamicJsonDocument val(1024);
     const size_t CAPACITY = JSON_ARRAY_SIZE(13);
@@ -355,7 +355,7 @@ void SwitchHandler::handlerSupportedActionsGet()
 
 void SwitchHandler::handleAction()
 {
-    Log.noticeln("handleAction called");
+    Log.traceln("handleAction called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -371,7 +371,7 @@ void SwitchHandler::handleAction()
 
 void SwitchHandler::handleCommandBlind()
 {
-    Log.noticeln("handleCommandBlind called");
+    Log.traceln("handleCommandBlind called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -382,15 +382,15 @@ void SwitchHandler::handleCommandBlind()
     String command = _server->arg("Command");
     String raw = _server->arg("Raw");
 
-    Log.noticeln("%s" CR, command);
-    Log.noticeln("%s" CR, raw);
+    Log.traceln("%s" CR, command);
+    Log.traceln("%s" CR, raw);
 
     returnEmpty("", 0);
 }
 
 void SwitchHandler::handleCommandBool()
 {
-    Log.noticeln("handleCommandBool called");
+    Log.traceln("handleCommandBool called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -401,15 +401,15 @@ void SwitchHandler::handleCommandBool()
     String command = _server->arg("Command");
     String raw = _server->arg("Raw");
 
-    Log.noticeln("%s" CR, command);
-    Log.noticeln("%s" CR, raw);
+    Log.traceln("%s" CR, command);
+    Log.traceln("%s" CR, raw);
 
     returnBoolValue(true, "", 0);
 }
 
 void SwitchHandler::handleCommandString()
 {
-    Log.noticeln("handleCommandBool called");
+    Log.traceln("handleCommandBool called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -420,8 +420,8 @@ void SwitchHandler::handleCommandString()
     String command = _server->arg("Command");
     String raw = _server->arg("Raw");
 
-    Log.noticeln("%s" CR, command.c_str());
-    Log.noticeln("%s" CR, raw.c_str());
+    Log.traceln("%s" CR, command.c_str());
+    Log.traceln("%s" CR, raw.c_str());
 
     returnStringValue("ok", "", 0);
 }
@@ -431,7 +431,7 @@ void SwitchHandler::handleCommandString()
  **********************************/
 void SwitchHandler::handlerDriver0Maxswitch()
 {
-    Log.noticeln("handlerDriver0Maxswitch called");
+    Log.traceln("handlerDriver0Maxswitch called");
     
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -440,7 +440,7 @@ void SwitchHandler::handlerDriver0Maxswitch()
 
 void SwitchHandler::handlerDriver0CanWrite()
 {
-    Log.noticeln("handlerDriver0CanWrite called");
+    Log.traceln("handlerDriver0CanWrite called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -452,19 +452,37 @@ void SwitchHandler::handlerDriver0CanWrite()
 
 void SwitchHandler::handlerDriver0SwitchDescription()
 {
-    Log.noticeln("handlerDriver0SwitchDescription called");
+    Log.traceln("handlerDriver0SwitchDescription called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
     // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
-    // u_int32_t id = (uint32_t)_server->arg("ID").toInt();
+    u_int32_t id = (uint32_t)_server->arg("ID").toInt();
     
-    returnStringValue("Switch Description", "", 0);
+    switch (id)
+    {
+    case 0:
+        returnStringValue(RELAY_1_DESC, "", 0);
+        break;
+    case 1:
+        returnStringValue(RELAY_2_DESC, "", 0);
+        break;
+    case 2:
+        returnStringValue(RELAY_3_DESC, "", 0);
+        break;
+    case 3:
+        returnStringValue(RELAY_4_DESC, "", 0);
+        break;
+    default:
+        returnStringValue("None", "", 0);
+        break;
+    }
+    
 }
 
 void SwitchHandler::handlerDriver0SwitchState()
 {
-    Log.noticeln("handlerDriver0SwitchState called");
+    Log.traceln("handlerDriver0SwitchState called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -473,7 +491,7 @@ void SwitchHandler::handlerDriver0SwitchState()
 
     if (_server->method() == HTTP_GET)
     {
-        Log.noticeln("GET SwitchState called");
+        Log.traceln("GET SwitchState called");
         if(id == 0)
         {
             returnBoolValue(switchDevice->relayState0, "", 0);
@@ -494,36 +512,19 @@ void SwitchHandler::handlerDriver0SwitchState()
     }
     else if (_server->method() == HTTP_PUT)
     {
-        Log.noticeln("PUT SwitchState called");
+        Log.traceln("PUT SwitchState called");
         bool val = (bool)_server->arg("State");
 
-        if(id == 0)
-        {
-            switchDevice->relayState0 = val;
-            returnEmpty("", 0);
-        }
-        else if(id == 1)
-        {
-            switchDevice->relayState1 = val;
-            returnEmpty("", 0);
-        }
-        else if(id == 2)
-        {
-            switchDevice->relayState2 = val;
-            returnEmpty("", 0);
-        }
-        else if(id == 3)
-        {
-            switchDevice->relayState3 = val;
-            returnEmpty("", 0);
-        }
+        switchDevice->setRelayState(id, val);
+        returnEmpty("", 0);
+        
     }
 
 }
 
 void SwitchHandler::handlerDriver0SwitchName()
 {
-    Log.noticeln("handlerDriver0SwitchName called");
+    Log.traceln("handlerDriver0SwitchName called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -551,7 +552,7 @@ void SwitchHandler::handlerDriver0SwitchName()
 
 void SwitchHandler::handlerDriver0SwitchValue()
 {
-    Log.noticeln("handlerDriver0SwitchValue called");
+    Log.traceln("handlerDriver0SwitchValue called");
     //debugServerQuery();
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
@@ -561,7 +562,7 @@ void SwitchHandler::handlerDriver0SwitchValue()
 
     if (_server->method() == HTTP_GET)
     {
-        Log.noticeln("GET SwitchValue called");
+        Log.traceln("GET SwitchValue called");
         if(id == 0)
         {
             returnDoubleValue(switchDevice->relayValue0, "", 0);
@@ -582,29 +583,11 @@ void SwitchHandler::handlerDriver0SwitchValue()
     }
     else if (_server->method() == HTTP_PUT)
     {
-        Log.noticeln("PUT SwitchValue called");
+        Log.traceln("PUT SwitchValue called");
         double val = (double)_server->arg("Value").toDouble();
         
-        if(id == 0)
-        {
-            switchDevice->relayValue0 = val;
-            returnEmpty("", 0);
-        }
-        else if(id == 1)
-        {
-            switchDevice->relayValue1 = val;
-            returnEmpty("", 0);
-        }
-        else if(id == 2)
-        {
-            switchDevice->relayValue2 = val;
-            returnEmpty("", 0);
-        }
-        else if(id == 3)
-        {
-            switchDevice->relayValue3 = val;
-            returnEmpty("", 0);
-        }
+        switchDevice->setRelayValue(id, val);
+        returnEmpty("", 0);
     }
 
 
@@ -612,7 +595,7 @@ void SwitchHandler::handlerDriver0SwitchValue()
 
 void SwitchHandler::handlerDriver0MinSwitchValue()
 {
-    Log.noticeln("handlerDriver0MinSwitchValue called");
+    Log.traceln("handlerDriver0MinSwitchValue called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -624,7 +607,7 @@ void SwitchHandler::handlerDriver0MinSwitchValue()
 
 void SwitchHandler::handlerDriver0MaxSwitchValue()
 {
-    Log.noticeln("handlerDriver0MaxSwitchValue called");
+    Log.traceln("handlerDriver0MaxSwitchValue called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
@@ -636,7 +619,7 @@ void SwitchHandler::handlerDriver0MaxSwitchValue()
 
 void SwitchHandler::handlerDriver0SwitchStep()
 {
-    Log.noticeln("handlerDriver0SwitchStep called");
+    Log.traceln("handlerDriver0SwitchStep called");
 
     clientID = (uint32_t)_server->arg("ClientID").toInt();
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();

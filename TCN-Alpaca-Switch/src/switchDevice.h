@@ -2,6 +2,8 @@
 #define SWITCHDEVICE_H
 
 #include <Arduino.h>
+#include <ArduinoLog.h>
+#include "configuration.hpp"
 
 class SwitchDevice
 {
