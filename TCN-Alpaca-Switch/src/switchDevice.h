@@ -8,25 +8,38 @@
 class SwitchDevice
 {
     public:
-    SwitchDevice();
+        SwitchDevice();
 
-    bool connected = false;
-    String uniqueID = "4431281c-8560-4ad7-982f-5a6e507dda19";
+        bool connected = false;
+        String uniqueID = "";
 
-    bool relayState0 = false;
-    bool relayState1 = false;
-    bool relayState2 = false;
-    bool relayState3 = false;
+        bool relayState0 = false;
+        bool relayState1 = false;
+        bool relayState2 = false;
+        bool relayState3 = false;
+        bool relayState4 = false;
+        bool relayState5 = false;
+        bool relayState6 = false;
+        bool relayState7 = false;
 
-    double relayValue0 = 0.0;
-    double relayValue1 = 0.0;
-    double relayValue2 = 0.0;
-    double relayValue3 = 0.0;
+        double relayValue0 = 0.0;
+        double relayValue1 = 0.0;
+        double relayValue2 = 0.0;
+        double relayValue3 = 0.0;
+        double relayValue4 = 0.0;
+        double relayValue5 = 0.0;
+        double relayValue6 = 0.0;
+        double relayValue7 = 0.0;
 
-    void setRelayState(int relayNr, bool state);
-    void setRelayValue(int relayNr, double value);
+        bool relayStateBool[8] = {false, false, false, false, false, false, false};
+        double relayStateValue[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+        void setRelayState(int relayNr, bool state);
+        void setRelayValue(int relayNr, double value);
 
     private:
+        void writeRelayData(int relay, int boolValue, double doubleValue);
+        byte relayData = B00000000;
 };
 
 #endif
