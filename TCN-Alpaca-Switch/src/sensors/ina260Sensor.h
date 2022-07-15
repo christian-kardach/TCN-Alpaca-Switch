@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <ArduinoLog.h>
 #include "configuration.hpp"
 
 #include <Adafruit_Sensor.h>
@@ -15,8 +16,8 @@ class INA260Sensor
         String getReading();
 
     private:
-       
-        Adafruit_INA260* ina260;
+        Adafruit_INA260 ina260;
+        bool found;
 
         float current;
         float voltage;

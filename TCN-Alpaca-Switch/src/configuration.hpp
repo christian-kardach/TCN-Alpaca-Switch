@@ -1,6 +1,6 @@
 #pragma once
 
-#define BOARD ESP32
+//#define ESP32
 
 #define SERVER_NAME "TCN"
 #define MANUFACTURER "Christian Kardach"
@@ -25,18 +25,18 @@
 
 #define DHT_PIN 14
 
-#define USE_BITSHIFT 1
+#define USE_BITSHIFT 0
 
-/*
-#define RELAY_PIN_0 5
-#define RELAY_PIN_1 4
-#define RELAY_PIN_2 14
-#define RELAY_PIN_3 12
-#define RELAY_PIN_4 13
-#define RELAY_PIN_5 15
-#define RELAY_PIN_6 13
-#define RELAY_PIN_7 15
-*/
+
+#define RELAY_PIN_0 19
+#define RELAY_PIN_1 18
+#define RELAY_PIN_2 17
+#define RELAY_PIN_3 16
+#define RELAY_PIN_4 27
+#define RELAY_PIN_5 26
+#define RELAY_PIN_6 25
+#define RELAY_PIN_7 33
+
 
 #define RELAY_0_NAME "Power Case Fan"
 #define RELAY_1_NAME "PSU 24V"

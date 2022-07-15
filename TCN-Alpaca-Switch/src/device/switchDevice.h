@@ -1,5 +1,4 @@
-#ifndef SWITCHDEVICE_H
-#define SWITCHDEVICE_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
@@ -41,5 +40,3 @@ class SwitchDevice
         void writeRelayData(int relay, int boolValue, double doubleValue);
         byte relayData = B00000000;
 };
-
-#endif

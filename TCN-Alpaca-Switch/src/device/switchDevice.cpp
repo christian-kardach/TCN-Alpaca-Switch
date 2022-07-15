@@ -1,7 +1,15 @@
-#include "switchDevice.h"
+#include "device\switchDevice.h"
 
 SwitchDevice::SwitchDevice()
 {
+    pinMode(RELAY_DATA_PIN, OUTPUT);
+    pinMode(RELAY_LATCH_PIN, OUTPUT);
+    pinMode(RELAY_CLOCK_PIN, OUTPUT);
+
+    writeRelayData(0, 0, 0.0);
+
+    
+
 #ifdef RELAY_PIN_0
     pinMode(RELAY_PIN_0, OUTPUT);
 #endif
@@ -36,6 +44,92 @@ void SwitchDevice::writeRelayData(int relay, int boolValue, double doubleValue)
     shiftOut(RELAY_DATA_PIN, RELAY_CLOCK_PIN, MSBFIRST, relayData);
     digitalWrite(RELAY_LATCH_PIN, HIGH);
     #endif
+
+    switch (relay)
+    {
+    case 0:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_0, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_0, LOW);
+        }
+        break;
+    case 1:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_1, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_1, LOW);
+        }
+        break;
+    case 2:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_2, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_2, LOW);
+        }
+        break;
+    case 3:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_3, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_3, LOW);
+        }
+        break;
+    case 4:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_4, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_4, LOW);
+        }
+        break;
+    case 5:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_5, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_5, LOW);
+        }
+        break;
+    case 6:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_6, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_6, LOW);
+        }
+        break;
+    case 7:
+        if (boolValue == true)
+        {
+            digitalWrite(RELAY_PIN_7, HIGH);
+        }
+        else
+        {
+            digitalWrite(RELAY_PIN_7, LOW);
+        }
+        break;
+    default:
+        break;
+    }
 
     relayStateBool[relay] = boolValue;
     relayStateValue[relay] = doubleValue;

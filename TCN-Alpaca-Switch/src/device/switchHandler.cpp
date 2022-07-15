@@ -1,7 +1,7 @@
-#include "switchHandler.h"
+#include "device\switchHandler.h"
 
 
-SwitchHandler::SwitchHandler(ESP8266WebServer *server)
+SwitchHandler::SwitchHandler(WebServer *server)
 {
     _server = server;
     switchDevice = new SwitchDevice();
@@ -479,17 +479,12 @@ void SwitchHandler::handlerDriver0SwitchDescription()
     case 5:
         returnStringValue(RELAY_5_DESC, "", 0);
         break;
-    #ifdef R6
     case 6:
         returnStringValue(RELAY_6_DESC, "", 0);
         break;
-    #endif
-
-    #ifdef R7
     case 7:
         returnStringValue(RELAY_7_DESC, "", 0);
         break;
-    #endif
     default:
         returnStringValue("None", "", 0);
         break;
@@ -550,9 +545,7 @@ void SwitchHandler::handlerDriver0SwitchState()
 
         switchDevice->setRelayState(id, val);
         returnEmpty("", 0);
-        
     }
-
 }
 
 void SwitchHandler::handlerDriver0SwitchName()
@@ -585,17 +578,12 @@ void SwitchHandler::handlerDriver0SwitchName()
     case 5:
         returnStringValue(RELAY_5_NAME, "", 0);
         break;
-    #ifdef R6
     case 6:
         returnStringValue(RELAY_6_NAME, "", 0);
         break;
-    #endif
-
-    #ifdef R7
     case 7:
         returnStringValue(RELAY_7_NAME, "", 0);
         break;
-    #endif
     
     default:
         break;
@@ -616,37 +604,8 @@ void SwitchHandler::handlerDriver0SwitchValue()
     if (_server->method() == HTTP_GET)
     {
         Log.traceln("GET SwitchValue called");
-
-        switch (id)
-        {
-        case 0:
-             returnDoubleValue(switchDevice->relayValue0, "", 0);
-            break;
-        case 1:
-             returnDoubleValue(switchDevice->relayValue1, "", 0);
-            break;
-        case 2:
-             returnDoubleValue(switchDevice->relayValue2, "", 0);
-            break;
-        case 3:
-             returnDoubleValue(switchDevice->relayValue3, "", 0);
-            break;
-        case 4:
-             returnDoubleValue(switchDevice->relayValue4, "", 0);
-            break;
-        case 5:
-             returnDoubleValue(switchDevice->relayValue5, "", 0);
-            break;
-        case 6:
-             returnDoubleValue(switchDevice->relayValue6, "", 0);
-            break;
-        case 7:
-             returnDoubleValue(switchDevice->relayValue7, "", 0);
-            break;
+        returnDoubleValue(switchDevice->relayStateValue[id], "", 0);
         
-        default:
-            break;
-        }
     }
     else if (_server->method() == HTTP_PUT)
     {

@@ -1,20 +1,19 @@
-#ifndef SWITCHHANDLER_H
-#define SWITCHHANDLER_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266HTTPUpdateServer.h>
+#include <WiFi.h>
+#include <HTTPUpdateServer.h>
 #include <ArduinoJson.h>
 #include "configuration.hpp"
 #include "switchDevice.h"
 
 class SwitchHandler
 {
-    ESP8266WebServer* _server;
+    WebServer* _server;
 
     public:
-        SwitchHandler(ESP8266WebServer* server);
+        SwitchHandler(WebServer* server);
         
         void handlerMgmtVersions();
         void handlerMgmtDescription();
@@ -65,4 +64,3 @@ class SwitchHandler
         void debugServerQuery();
         
 };
-#endif

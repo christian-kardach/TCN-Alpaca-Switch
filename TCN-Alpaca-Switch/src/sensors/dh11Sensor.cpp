@@ -2,13 +2,13 @@
 
 DH11Sensor::DH11Sensor()
 {
-    DH11Sensor::dht = new DHT(DHT_PIN, DHT11);
     t = 0.0f;
     h = 0.0f;
 }
 
 void DH11Sensor::setup()
 {
+    DH11Sensor::dht = new DHT(DHT_PIN, DHT11);
 }
 
 float DH11Sensor::getTemperature()
@@ -33,13 +33,13 @@ float DH11Sensor::getHumidity()
 
 String DH11Sensor::getReading()
 {
-    getTemperature();
-    getHumidity();
-
+    float tR = getTemperature();
+    float hR = getHumidity();
+    
     DynamicJsonDocument doc(1024);
     doc["sensor"] = "SwitchTemperature";
-    doc["temperature"] = t;
-    doc["humidity"] = h;
+    doc["temperature"] = tR;
+    doc["humidity"] = hR;
 
     String output;
     serializeJson(doc, output);

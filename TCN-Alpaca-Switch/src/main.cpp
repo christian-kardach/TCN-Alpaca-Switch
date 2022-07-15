@@ -1,23 +1,18 @@
 #include <Arduino.h>
-#include "configuration.hpp"
-
-#include <ArduinoLog.h>
-#include <ArduinoJson.h>
-#include <ESP8266WiFi.h>
-#include <WiFiClient.h>
-#include <WiFiUdp.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266HTTPUpdateServer.h>
+#include <WiFi.h>
+#include <HTTPUpdateServer.h>
 #include <arduino-timer.h>
 #include <Redis.h>
-#include <mDNSResolver.h>
+#include <ArduinoLog.h>
+
+//#include <Adafruit_Sensor.h>
+//#include <Adafruit_INA260.h>
 
 #include "arduino_secrets.h"
-#include "switchHandler.h"
-#include "sensors/dh11Sensor.h"
-#include "sensors/ina260Sensor.h"
-
-using namespace mDNSResolver;
+#include "configuration.hpp"
+#include "device\switchHandler.h"
+#include "sensors\dh11Sensor.h"
+#include "sensors\ina260Sensor.h"
 
 int status = WL_IDLE_STATUS;
 ///////enter your sensitive data in the Secret tab/arduino_secrets.h
@@ -31,19 +26,19 @@ unsigned int alpacaPort = 11111; // The (fake) port that the Alpaca API would be
 
 char packetBuffer[255]; // buffer to hold incoming packet
 
-ESP8266WebServer *server = new ESP8266WebServer(alpacaPort);
+WebServer *server = new WebServer(alpacaPort);
 
-ESP8266HTTPUpdateServer updater;
+HTTPUpdateServer updater;
 WiFiUDP Udp;
 
 // Redis
-Resolver resolver(Udp);
 bool redisConnected = false;
 WiFiClient redisConn;
 Redis *gRedis = nullptr;
 
 SwitchHandler *device = new SwitchHandler(server);
 DH11Sensor *dh11 = new DH11Sensor();
+// Adafruit_INA260 ina260 = Adafruit_INA260();
 INA260Sensor *ina260 = new INA260Sensor();
 
 auto timer = timer_create_default();
@@ -79,13 +74,18 @@ void CheckForDiscovery()
     }
 
     char response[36] = {0};
-
     sprintf(response, "{\"AlpacaPort\": %d}", alpacaPort);
 
-    // send a reply, to the IP address and port that sent us the packet we received
+    uint8_t buffer[36] = "{\"AlpacaPort\": 11111}";
+
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write(response);
+    Udp.write(buffer, 36);
     Udp.endPacket();
+
+    // send a reply, to the IP address and port that sent us the packet we received
+    //Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+    //Udp.write(buffer, 36);
+    //Udp.endPacket();
   }
 }
 
@@ -105,24 +105,26 @@ void printWifiStatus()
 
 bool readSensors(void *)
 {
+  
   String temperatureReading = dh11->getReading();
-  Log.infoln("DH11: %S" CR, temperatureReading);
-
+  Log.infoln(F("DH11: %S" CR), temperatureReading.c_str());
+  
   String powerReading = ina260->getReading();
-  Log.infoln("INA260: %S" CR, powerReading);
-
-
+  Log.infoln("INA260: %S" CR, powerReading.c_str());
+  
+  
   if (redisConnected)
   {
     gRedis->publish("app:notifications", temperatureReading.c_str());
     gRedis->publish("app:notifications", powerReading.c_str());
   }
-
+  
   return true; // repeat? true
 }
 
 void connectToRedis()
 {
+  /*
   resolver.setLocalIP(WiFi.localIP());
 
   Serial.printf("Attempting to resolve %s\n", REDIS_ADDR);
@@ -133,12 +135,12 @@ void connectToRedis()
     Serial.println("Gotta result!");
     Serial.println(answer);
   }
+  */
 
   // Redis
-  String redishost = "192.168.1.208"; 
-  if (!redisConn.connect(redishost, REDIS_PORT))
+  if (!redisConn.connect(REDIS_ADDR, REDIS_PORT))
   {
-    Serial.println("Failed to connect to the Redis server!");
+    Log.errorln("%S" CR, "Failed to connect to the Redis server!");
     redisConnected = false;
   }
   else
@@ -147,12 +149,12 @@ void connectToRedis()
     auto connRet = gRedis->authenticate(REDIS_PASSWORD);
     if (connRet == RedisSuccess)
     {
-      Serial.printf("Connected to the Redis server at %s!\n", REDIS_ADDR);
+      Log.infoln("Connected to the Redis server at %S" CR, REDIS_ADDR);
       redisConnected = true;
     }
     else
     {
-      Serial.printf("Failed to authenticate to the Redis server! Errno: %d\n", (int)connRet);
+      Log.errorln("Failed to authenticate to the Redis server! Errno: %d" CR,  connRet);
       redisConnected = false;
     } 
   }
@@ -193,7 +195,7 @@ void setup()
   Serial.begin(9600);
 
   // Initialize with log level and log output.
-  Log.begin(LOG_LEVEL_INFO, &Serial);
+  Log.begin(LOG_LEVEL_ERROR, &Serial);
 
   Log.infoln("Connecting to WIFI...");
 
@@ -259,6 +261,10 @@ void setup()
   Udp.begin(localPort);
 
   connectToRedis();
+
+  // Setup sensors
+  dh11->setup();
+  ina260->setup();
 
   timer.every(1000, readSensors);
 }
