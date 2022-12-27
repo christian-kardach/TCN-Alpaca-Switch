@@ -293,24 +293,9 @@ void setup()
   */
   webServer.begin();
 
-  // Setup sensors
-  // dh11->setup();
-  // ina260->setup();
-
-  // timer.every(1000, readSensors);
 }
 
 void handleRoot() {
-  /*
-  String result = index_html_header;
-  for(int i=1; i<=NR_OF_RELAYS; i++){
-    String relayStateValue = String(device->getSwitchState(i));
-    result += "<h4>" +  device->getSwitchName(i-1) + " (#" + String(i) + ")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String(i) + "\" "+ relayStateValue +"><span class=\"slider\"></span></label>";
-  }
-  result += index_html_footer;
-  webServer.send(200, "text/html", result);   // Send HTTP status 200 (Ok) and send some text to the browser/client
-  */
-
   String result = index_html_header;
   result += "<table class=\"center\">";
 
@@ -349,8 +334,6 @@ void handleRoot() {
     result += "</td>";
 
     result += "</tr>";
-
-    //result += "<h4>" +  device->getSwitchName(i-1) + " (#" + String(i) + ")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String(i) + "\" "+ relayStateValue +"><span class=\"slider\"></span></label>";
   }
   result += "</table>";
   result += index_html_footer;
@@ -368,9 +351,6 @@ void handleUpdate() {
   device->setSwitchState(id-1, bool(state));
 
   webServer.send(200, "text/plain", "ok");           
-  // digitalWrite(led,!digitalRead(led));      
-  // server.sendHeader("Location","/");        
-  // server.send(303);
 }
 
 void handleEdit()
@@ -383,14 +363,9 @@ void handleEdit()
     result += "<input type=\"text\" id=\"ch"+String(i)+"\" name=\"ch" + String(i) + "\" placeholder=\"Channel 1..\" value=\""+device->getSwitchName(i-1)+"\">";
   }
   result += "<input type=\"submit\" value=\"Save\" style=\"margin-top: 10px;\"></form>";
-  /*
-  for(int i=1; i<=NR_OF_RELAYS; i++){
-    result += "<label>Relay #"+ String(i) + "<input type=\"text\" name=\"ch" + String(i) + "\" placeholder=\"Relay " + String(i) + "\" value=\""+device->getSwitchName(i-1)+"\"></br></label>";
-  }
-  result += "<input type=\"submit\" value=\"Save\" style=\"margin-top: 10px;\"></form>";
-  */
+
   result += edit_html_footer;
-  webServer.send(200, "text/html", result);   // Send HTTP status 200 (Ok) and send some text to the browser/client
+  webServer.send(200, "text/html", result);
 }
 
 void handleRename()

@@ -462,37 +462,7 @@ void SwitchHandler::handlerDriver0SwitchDescription()
     // u_int32_t deviceNumber = (uint32_t)_server->arg("device_number").toInt();
     u_int32_t id = (uint32_t)_server->arg("ID").toInt();
     
-    switch (id)
-    {
-    case 0:
-        returnStringValue(RELAY_0_DESC, "", 0);
-        break;
-    case 1:
-        returnStringValue(RELAY_1_DESC, "", 0);
-        break;
-    case 2:
-        returnStringValue(RELAY_2_DESC, "", 0);
-        break;
-    case 3:
-        returnStringValue(RELAY_3_DESC, "", 0);
-        break;
-    case 4:
-        returnStringValue(RELAY_4_DESC, "", 0);
-        break;
-    case 5:
-        returnStringValue(RELAY_5_DESC, "", 0);
-        break;
-    case 6:
-        returnStringValue(RELAY_6_DESC, "", 0);
-        break;
-    case 7:
-        returnStringValue(RELAY_7_DESC, "", 0);
-        break;
-    default:
-        returnStringValue("None", "", 0);
-        break;
-    }
-    
+    returnStringValue(switchDevice->channelDesc[id], "", 0);
 }
 
 void SwitchHandler::handlerDriver0SwitchState()
@@ -507,7 +477,7 @@ void SwitchHandler::handlerDriver0SwitchState()
     {
         Log.traceln("GET SwitchState called");
 
-        returnBoolValue(switchDevice->relayStateBool[id], "", 0);
+        returnBoolValue(switchDevice->getRelayState(id), "", 0);
     }
     else if (_server->method() == HTTP_PUT)
     {
@@ -527,37 +497,7 @@ void SwitchHandler::handlerDriver0SwitchName()
     transID = (uint32_t)_server->arg("ClientTransactionID").toInt();
     u_int32_t id = (uint32_t)_server->arg("ID").toInt();
 
-    switch (id)
-    {
-    case 0:
-        returnStringValue(RELAY_0_NAME, "", 0);
-        break;
-    case 1:
-        returnStringValue(RELAY_1_NAME, "", 0);
-        break;
-    case 2:
-        returnStringValue(RELAY_2_NAME, "", 0);
-        break;
-    case 3:
-        returnStringValue(RELAY_3_NAME, "", 0);
-        break;
-    case 4:
-        returnStringValue(RELAY_4_NAME, "", 0);
-        break;
-    case 5:
-        returnStringValue(RELAY_5_NAME, "", 0);
-        break;
-    case 6:
-        returnStringValue(RELAY_6_NAME, "", 0);
-        break;
-    case 7:
-        returnStringValue(RELAY_7_NAME, "", 0);
-        break;
-    
-    default:
-        break;
-    }
-    
+    returnStringValue(switchDevice->channelNames[id], "", 0);
 }
 
 void SwitchHandler::handlerDriver0SwitchValue()
@@ -573,7 +513,7 @@ void SwitchHandler::handlerDriver0SwitchValue()
     if (_server->method() == HTTP_GET)
     {
         Log.traceln("GET SwitchValue called");
-        returnDoubleValue(switchDevice->relayStateValue[id], "", 0);
+        returnDoubleValue(switchDevice->getRelayStateDouble(id), "", 0);
         
     }
     else if (_server->method() == HTTP_PUT)

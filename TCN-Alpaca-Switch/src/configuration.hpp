@@ -4,7 +4,7 @@
 
 #define SERVER_NAME "TCN"
 #define MANUFACTURER "Christian Kardach"
-#define MANUFACTURER_VERSION "1.0"
+#define MANUFACTURER_VERSION "1.1"
 #define LOCATION "SE"
 
 #define DEVICE_NAME "TCN Power Switch"
@@ -14,7 +14,7 @@
 
 #define DESCRIPTION "Mount ASCOM Switch for controlling power supplies"
 #define DRIVER_INFO "TCN ASCOM Alpaca Driver"
-#define DRIVER_VERSION "1.0"
+#define DRIVER_VERSION "1.1"
 
 #define EEPROM_SIZE 512
 // Zero based
