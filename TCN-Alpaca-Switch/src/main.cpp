@@ -1,6 +1,7 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <HTTPUpdateServer.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266HTTPUpdateServer.h>
 #include <arduino-timer.h>
 #include <Redis.h>
 #include <ArduinoLog.h>
@@ -11,8 +12,9 @@
 #include "arduino_secrets.h"
 #include "configuration.hpp"
 #include "device\switchHandler.h"
-#include "sensors\dh11Sensor.h"
-#include "sensors\ina260Sensor.h"
+// #include "sensors\dh11Sensor.h"
+// #include "sensors\ina260Sensor.h"
+#include "html.h"
 
 int status = WL_IDLE_STATUS;
 ///////enter your sensitive data in the Secret tab/arduino_secrets.h
@@ -26,10 +28,11 @@ unsigned int alpacaPort = 11111; // The (fake) port that the Alpaca API would be
 
 char packetBuffer[255]; // buffer to hold incoming packet
 
-WebServer *server = new WebServer(alpacaPort);
+ESP8266WebServer *server = new ESP8266WebServer(alpacaPort);
 
-HTTPUpdateServer updater;
+ESP8266HTTPUpdateServer updater;
 WiFiUDP Udp;
+ESP8266WebServer webServer(80);
 
 // Redis
 bool redisConnected = false;
@@ -37,12 +40,19 @@ WiFiClient redisConn;
 Redis *gRedis = nullptr;
 
 SwitchHandler *device = new SwitchHandler(server);
-DH11Sensor *dh11 = new DH11Sensor();
+// DH11Sensor *dh11 = new DH11Sensor();
 // Adafruit_INA260 ina260 = Adafruit_INA260();
-INA260Sensor *ina260 = new INA260Sensor();
+// INA260Sensor *ina260 = new INA260Sensor();
 
 auto timer = timer_create_default();
 
+// Forward declarations
+void handleRoot();
+void handleUpdate();
+void handleEdit();
+void handleRename();
+
+// ALPACA
 void CheckForDiscovery()
 {
   // if there's data available, read a packet
@@ -102,7 +112,7 @@ void printWifiStatus()
   long rssi = WiFi.RSSI();
   Log.traceln("signal strength (RSSI): %l dBm" CR, rssi);
 }
-
+/*
 bool readSensors(void *)
 {
   
@@ -121,22 +131,9 @@ bool readSensors(void *)
   
   return true; // repeat? true
 }
-
+*/
 void connectToRedis()
 {
-  /*
-  resolver.setLocalIP(WiFi.localIP());
-
-  Serial.printf("Attempting to resolve %s\n", REDIS_ADDR);
-  IPAddress answer = resolver.search(REDIS_ADDR);
-  if(answer == IPADDR_NONE) {
-    Serial.println("no answer found");
-  } else {
-    Serial.println("Gotta result!");
-    Serial.println(answer);
-  }
-  */
-
   // Redis
   if (!redisConn.connect(REDIS_ADDR, REDIS_PORT))
   {
@@ -188,6 +185,27 @@ void handleDriver0MaxSwitchValue() { device->handlerDriver0MaxSwitchValue(); }
 void handleDriver0SwitchStep() { device->handlerDriver0SwitchStep(); }
 
 /******************************************
+ * HTML
+*/
+
+
+
+/*
+// Replaces placeholder with button section in your web page
+String processor(const String& var){
+  //Serial.println(var);
+  if(var == "BUTTONPLACEHOLDER"){
+    String buttons ="";
+    // for(int i=1; i<=NUM_RELAYS; i++){
+    //  String relayStateValue = relayState(i);
+    //  buttons+= "<h4>Relay #" + String(i) + " - GPIO " + relayGPIOs[i-1] + "</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String(i) + "\" "+ relayStateValue +"><span class=\"slider\"></span></label>";
+    //}
+    return buttons;
+  }
+  return String();
+}
+*/
+/******************************************
  * SETUP
  ******************************************/
 void setup()
@@ -195,7 +213,7 @@ void setup()
   Serial.begin(9600);
 
   // Initialize with log level and log output.
-  Log.begin(LOG_LEVEL_ERROR, &Serial);
+  Log.begin(LOG_LEVEL_TRACE, &Serial);
 
   Log.infoln("Connecting to WIFI...");
 
@@ -262,17 +280,137 @@ void setup()
 
   connectToRedis();
 
-  // Setup sensors
-  dh11->setup();
-  ina260->setup();
+  // Webserver
+  webServer.on("/", handleRoot);
+  webServer.on("/edit", handleEdit);
+  webServer.on("/rename", HTTP_POST, handleRename);
 
-  timer.every(1000, readSensors);
+  webServer.on("/update", HTTP_GET, handleUpdate);
+  /*
+  webServer.on("/", HTTP_GET, [](ESP8266WebServer *request){
+    webServer.send_P(200, "text/html", index_html);
+  });
+  */
+  webServer.begin();
+
+  // Setup sensors
+  // dh11->setup();
+  // ina260->setup();
+
+  // timer.every(1000, readSensors);
+}
+
+void handleRoot() {
+  /*
+  String result = index_html_header;
+  for(int i=1; i<=NR_OF_RELAYS; i++){
+    String relayStateValue = String(device->getSwitchState(i));
+    result += "<h4>" +  device->getSwitchName(i-1) + " (#" + String(i) + ")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String(i) + "\" "+ relayStateValue +"><span class=\"slider\"></span></label>";
+  }
+  result += index_html_footer;
+  webServer.send(200, "text/html", result);   // Send HTTP status 200 (Ok) and send some text to the browser/client
+  */
+
+  String result = index_html_header;
+  result += "<table class=\"center\">";
+
+  for(int i=1; i<=NR_OF_RELAYS; i+=2){
+    String relayStateValue = "";
+    if(device->getSwitchState(i-1) == true)
+    {
+      relayStateValue = "checked";
+    }
+
+    result += "<tr class=\"tr-main\">";
+    result += "<td class=\"td-first\">";
+    result += "<label>";
+    result += "<input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String(i) + "\" "+ relayStateValue +">";
+    result += "<span class=\"slider\"></span>";
+    result += "</label>";
+    result += "</td>";
+    result += "<td class=\"name-title\">";
+    result += device->getSwitchName(i-1);
+    result += "</td>";
+
+    relayStateValue = "";
+    if(device->getSwitchState(i) == true)
+    {
+      relayStateValue = "checked";
+    }
+
+    result += "<td class=\"td-second\">";
+    result += "<label>";
+    result += "<input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String(i+1) + "\" "+ relayStateValue +">";
+    result += "<span class=\"slider\"></span>";
+    result += "</label>";
+    result += "</td>";
+    result += "<td class=\"name-title\">";
+    result += device->getSwitchName(i);
+    result += "</td>";
+
+    result += "</tr>";
+
+    //result += "<h4>" +  device->getSwitchName(i-1) + " (#" + String(i) + ")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String(i) + "\" "+ relayStateValue +"><span class=\"slider\"></span></label>";
+  }
+  result += "</table>";
+  result += index_html_footer;
+  webServer.send(200, "text/html", result);   // Send HTTP status 200 (Ok) and send some text to the browser/client
+
+}
+
+void handleUpdate() {         
+  String message = "";
+
+  int id = webServer.arg("relay").toInt();
+  int state = webServer.arg("state").toInt();
+  Log.traceln(F("Web submit switch nr: %d %T" CR), id, state);
+
+  device->setSwitchState(id-1, bool(state));
+
+  webServer.send(200, "text/plain", "ok");           
+  // digitalWrite(led,!digitalRead(led));      
+  // server.sendHeader("Location","/");        
+  // server.send(303);
+}
+
+void handleEdit()
+{
+  String result = edit_html_header;
+  result += "<form action=\"/rename\" method=\"POST\">";
+
+  for(int i=1; i<=NR_OF_RELAYS; i++){
+    result += "<label for=\"ch"+String(i)+"\">Channel "+String(i)+"</label>";
+    result += "<input type=\"text\" id=\"ch"+String(i)+"\" name=\"ch" + String(i) + "\" placeholder=\"Channel 1..\" value=\""+device->getSwitchName(i-1)+"\">";
+  }
+  result += "<input type=\"submit\" value=\"Save\" style=\"margin-top: 10px;\"></form>";
+  /*
+  for(int i=1; i<=NR_OF_RELAYS; i++){
+    result += "<label>Relay #"+ String(i) + "<input type=\"text\" name=\"ch" + String(i) + "\" placeholder=\"Relay " + String(i) + "\" value=\""+device->getSwitchName(i-1)+"\"></br></label>";
+  }
+  result += "<input type=\"submit\" value=\"Save\" style=\"margin-top: 10px;\"></form>";
+  */
+  result += edit_html_footer;
+  webServer.send(200, "text/html", result);   // Send HTTP status 200 (Ok) and send some text to the browser/client
+}
+
+void handleRename()
+{
+  for(int i=1; i<=NR_OF_RELAYS; i++){
+    String chName = webServer.arg("ch"+String(i));
+    Log.traceln(F("Name: %c" CR), chName.c_str());
+    device->setSwitchName(i-1, chName);
+  }
+  
+  device->storeEEPROM();
+
+  webServer.sendHeader("Location", String("/"), true);
+  webServer.send ( 302, "text/plain", "");
 }
 
 void loop()
 {
-
   server->handleClient();
+  webServer.handleClient();
   CheckForDiscovery();
   timer.tick();
 }

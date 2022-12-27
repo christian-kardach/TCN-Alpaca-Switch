@@ -16,18 +16,20 @@
 #define DRIVER_INFO "TCN ASCOM Alpaca Driver"
 #define DRIVER_VERSION "1.0"
 
+#define EEPROM_SIZE 512
 // Zero based
-#define NR_OF_RELAYS 8
+#define NR_OF_RELAYS 16
 
-#define RELAY_DATA_PIN 15
-#define RELAY_LATCH_PIN 13
-#define RELAY_CLOCK_PIN 12
+#define RELAY_DATA_PIN 14
+#define RELAY_LATCH_PIN 12
+#define RELAY_CLOCK_PIN 13
+#define RELAY_OE_PIN 5
 
 #define DHT_PIN 14
 
-#define USE_BITSHIFT 0
+#define USE_BITSHIFT 1
 
-
+/*
 #define RELAY_PIN_0 19
 #define RELAY_PIN_1 18
 #define RELAY_PIN_2 17
@@ -36,7 +38,7 @@
 #define RELAY_PIN_5 26
 #define RELAY_PIN_6 25
 #define RELAY_PIN_7 33
-
+*/
 
 #define RELAY_0_NAME "Power Case Fan"
 #define RELAY_1_NAME "PSU 24V"

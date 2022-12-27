@@ -2,18 +2,18 @@
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
-#include <WiFi.h>
-#include <HTTPUpdateServer.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPUpdateServer.h>
 #include <ArduinoJson.h>
 #include "configuration.hpp"
 #include "switchDevice.h"
 
 class SwitchHandler
 {
-    WebServer* _server;
+    ESP8266WebServer* _server;
 
     public:
-        SwitchHandler(WebServer* server);
+        SwitchHandler(ESP8266WebServer* server);
         
         void handlerMgmtVersions();
         void handlerMgmtDescription();
@@ -41,6 +41,13 @@ class SwitchHandler
         void handlerDriver0MinSwitchValue();
         void handlerDriver0MaxSwitchValue();
         void handlerDriver0SwitchStep();
+
+        // Custom handlers for webpage
+        bool getSwitchState(int id);
+        void setSwitchState(int id, bool state);
+        String getSwitchName(int id);
+        void setSwitchName(int id, String name);
+        void storeEEPROM();
     
     private:
         uint32_t transID;
